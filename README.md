@@ -1,4 +1,4 @@
-# sf-gha-run-tests
+# sf-gha-run-tests [in development]
 
 Github action for å kjøre apex tester.
 
