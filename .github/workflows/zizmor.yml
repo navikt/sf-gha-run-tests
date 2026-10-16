@@ -3,15 +3,20 @@ name: zizmor GitHub Actions Security Analysis
 on:
   push:
 
+permissions: {}
+
+concurrency:
+  group: zizmor
+  cancel-in-progress: true
+
 jobs:
   zizmor:
     name: zizmor latest via PyPI
     runs-on: ubuntu-latest
     permissions:
-      security-events: write
-      # required for workflows in private repositories
+      security-events: write # required for workflows in private repositories
       contents: read
-      actions: read
+      actions: read # required for workflows in private repositories
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1

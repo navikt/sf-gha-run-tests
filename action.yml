@@ -1,17 +1,38 @@
-name: Action Name
-description: Action description
+name: Run Tests and Check Code Coverage
+description: Runs tests and checks if the code coverage meets the required threshold.
 inputs:
-  input-parameter:
-    description: Description of input parameter
+  required-code-coverage:
+    description: Code coverage input parameter
+    default: '85'
     required: true
+  target-org:
+    description: Target Salesforce org for deployment
+    required: true
+outputs:
+  code-coverage:
+    description: The code coverage percentage
+    value: ${{ steps.run-tests.outputs.code-coverage }}
+  is-code-covered:
+    description: Whether the code coverage meets the required threshold
+    value: ${{ steps.run-tests.outputs.is-code-covered }}
+  is-test-success:
+    description: Whether the tests were successful
+    value: ${{ steps.run-tests.outputs.is-test-success }}
 runs:
   using: "composite"
   steps:
-    
-    - name: Authenticate org
+    - name: Run Tests
+      id: run-tests
       run: |
-        echo "Hello World!"
-        echo "Input Parameter: $INPUT_PARAMETER"
+        bash scripts/run-tests.sh
+
+        echo "code-coverage=$code_coverage" >> $GITHUB_OUTPUT
+        echo "is-code-covered=$is_code_covered" >> $GITHUB_OUTPUT
+        echo "is-test-success=$is_test_success" >> $GITHUB_OUTPUT
+
+        echo "$step_summary" >> $GITHUB_STEP_SUMMARY
       shell: bash
       env:
-        INPUT_PARAMETER: ${{ inputs.input-parameter }}
+        REQUIRED_CODE_COVERAGE: ${{ inputs.required-code-coverage }}
+        TARGET_ORG: ${{ inputs.target-org }}
+
