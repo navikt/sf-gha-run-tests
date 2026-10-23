@@ -26,11 +26,13 @@ runs:
       run: |
         bash "$GITHUB_ACTION_PATH/scripts/run-tests.sh"
 
-        echo "code-coverage=$code_coverage" >> $GITHUB_OUTPUT
-        echo "is-code-covered=$is_code_covered" >> $GITHUB_OUTPUT
-        echo "is-test-success=$is_test_success" >> $GITHUB_OUTPUT
+        jq -r '
+          "code-coverage=\(.code_coverage)",
+          "is-code-covered=\(.is_code_covered)",
+          "is-test-success=\(.is_test_success)"
+        ' test-run/results.json >> "$GITHUB_OUTPUT"
 
-        echo "$step_summary" >> $GITHUB_STEP_SUMMARY
+        cat test-run/step-summary.md >> "$GITHUB_STEP_SUMMARY"
       shell: bash
       env:
         REQUIRED_CODE_COVERAGE: ${{ inputs.required-code-coverage }}

@@ -7,7 +7,7 @@ GitHub Action that runs relevant Apex tests for Salesforce code and reports test
 - Salesforce CLI (`sf`) and `jq` must be installed.
 - Salesforce CLI must be authenticated to the target org. `target-org` must be an alias or another value accepted by the CLI.
 - Source code must be in `force-app` in the workspace.
-- The action runs `bash scripts/run-tests.sh` relative to the workspace. Therefore, `scripts/run-tests.sh` and `scripts/create-error-summary.sh` must be available there.
+- The action uses its bundled scripts. Run it from the workspace containing `force-app`.
 
 ## Usage
 
@@ -32,6 +32,8 @@ Test results and coverage are shown in the GitHub Actions step summary. If the r
     run: exit 1
 ```
 
+Unexpected script errors, missing dependencies, invalid coverage data, and invalid inputs fail the action immediately. Required coverage must be a number between `0` and `100`. Missing coverage reports produce `code-coverage=0` and `is-code-covered=false`.
+
 ## Outputs
 
 | Output | Description |
@@ -42,7 +44,11 @@ Test results and coverage are shown in the GitHub Actions step summary. If the r
 
 ## Test Run Files
 
-The action writes Salesforce CLI results to `test-run/` in the workflow workspace. This includes `test-run.json`, coverage reports under `coverage/`, and `summary.md` when the run fails. Later steps in the same job can read these files directly. To use them in another job or download them after the workflow completes, upload the directory as an artifact:
+The action writes Salesforce CLI results to `test-run/` in the workflow workspace. This includes `test-run.json`, coverage reports under `coverage/`, `step-summary.md`, and `summary.md` when the run fails. Generated reports consumed by the script are cleared before each run to prevent stale results.
+
+The script can also run outside GitHub Actions with `TARGET_ORG` and `REQUIRED_CODE_COVERAGE` set. It writes `results.json` containing numeric `code_coverage` and boolean `is_code_covered` and `is_test_success` fields. A handled Salesforce failure is reported through these fields; unexpected script errors exit nonzero.
+
+Later steps in the same job can read these files directly. To use them in another job or download them after the workflow completes, upload the directory as an artifact:
 
 ```yaml
 - name: Upload test results
