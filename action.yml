@@ -24,7 +24,7 @@ runs:
     - name: Run Tests
       id: run-tests
       run: |
-        bash scripts/run-tests.sh
+        bash "$GITHUB_ACTION_PATH/scripts/run-tests.sh"
 
         echo "code-coverage=$code_coverage" >> $GITHUB_OUTPUT
         echo "is-code-covered=$is_code_covered" >> $GITHUB_OUTPUT
